@@ -1,6 +1,7 @@
 (ns codeclimate.kibit
   (:require [clojure.java.io :as io]
             [clojure.pprint :as pp]
+            [clojure.tools.cli :as cli]
             [kibit.driver :as kibit]
             [kibit.reporters :as reporters]
             [cheshire.core :as json])
@@ -55,8 +56,36 @@
     (with-redefs [reporters/name-to-reporter reporters-map]
       (kibit/run target-files "-r" reporter-name))))
 
+(def cli-options
+  [["-C" "--config PATH" "Load PATH as a config file"]
+   ["-h" "--help"]])
+
+(defn usage [options-summary]
+  (->> ["CodeClimate kibit engine"
+        ""
+        "Usage: java -jar codeclimate.jar [options] DIR"
+        ""
+        "Options:"
+        options-summary
+        ""]
+       (clojure.string/join \newline)))
+
+(defn error-msg [errors]
+  (str "The following errors occurred while parsing your command:\n\n"
+       (clojure.string/join \newline errors)))
+
+(defn exit [status message]
+  (println message)
+  (System/exit status))
+
 (defn -main [& args]
-  (let [target-dir  (io/file "/code")
-        config-file (io/file "/config.json")
-        config-data (when (.exists config-file) (json/parse-stream config-file))]
-    (analize target-dir config-data)))
+  (let [{:keys [options arguments errors summary]} (cli/parse-opts args cli-options)]
+    (cond
+      (:help options) (exit 0 (usage summary))
+      (not= (count arguments) 1) (exit 1 (usage summary))
+      errors (exit 1 (error-msg errors)))
+    (let [target-dir  (io/file (first arguments))
+          config-file (io/file (:config options))
+          config-data (when (and config-file (.exists config-file))
+                        (json/parse-string (slurp config-file)))]
+      (analize target-dir config-data))))

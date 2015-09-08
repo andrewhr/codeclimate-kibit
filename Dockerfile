@@ -8,4 +8,4 @@ ADD target/codeclimate-kibit.jar /usr/src/app/codeclimate-kibit.jar
 
 USER app
 
-CMD ["java", "-jar", "/usr/src/app/codeclimate-kibit.jar"]
+CMD ["java", "-jar", "/usr/src/app/codeclimate-kibit.jar", "/code", "-C", "/config.json"]
