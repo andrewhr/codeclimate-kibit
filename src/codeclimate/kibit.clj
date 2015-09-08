@@ -20,12 +20,12 @@
   [check-map]
   (let [{:keys [file line expr alt]} check-map
         issue {:type               "issue"
-               :check_name         "kibit/suggestion",
-               :description        (str "Consider use `" (pprint-code alt) "`"),
-               :categories         ["Clarity" "Style"],
+               :check_name         "kibit/suggestion"
+               :description        "Non-idiomatic code"
+               :categories         ["Clarity" "Style"]
                :location           {:path  (str file)
                                     :lines {:begin line
-                                            :end   line}},
+                                            :end   line}}
                :content            (str "Consider using:\n"
                                         "```clojure\n"
                                         (pprint-code alt) "\n"
