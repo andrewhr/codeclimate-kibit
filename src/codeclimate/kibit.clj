@@ -35,7 +35,7 @@
                                         (pprint-code expr) "\n"
                                         "```")
                :remediation_points 500}]
-    (println (json/generate-string issue {:pretty true}))))
+    (println (json/generate-string issue))))
 
 (defn exclude? [excluded-paths candidate]
   (some #(.startsWith candidate %) excluded-paths))
