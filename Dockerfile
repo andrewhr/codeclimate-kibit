@@ -1,11 +1,12 @@
-FROM java
+FROM clojure
 MAINTAINER Andrew Rosa
 
-RUN useradd -r -s /bin/false app
-
-WORKDIR /code
-ADD target/codeclimate-kibit.jar /usr/src/app/codeclimate-kibit.jar
-
+RUN useradd -r -s /bin/false -m app
 USER app
+ADD . /home/app
+WORKDIR /home/app
 
-CMD ["java", "-jar", "/usr/src/app/codeclimate-kibit.jar", "/code", "-C", "/config.json"]
+RUN lein uberjar
+WORKDIR /code
+
+CMD ["java", "-jar", "/home/app/target/codeclimate-kibit.jar", ".", "-C", "/config.json"]

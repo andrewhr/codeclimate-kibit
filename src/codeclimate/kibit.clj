@@ -21,21 +21,21 @@
   (let [{:keys [file line expr alt]} check-map
         issue {:type               "issue"
                :check_name         "kibit/suggestion"
-               :description        "Non-idiomatic code"
+               :description        (str "Non-idiomatic code found in `" (first (seq expr)) "`")
                :categories         ["Clarity" "Style"]
-               :location           {:path  (str file)
+               :location           {:path  (subs (str file) 2)
                                     :lines {:begin line
                                             :end   line}}
-               :content            (str "Consider using:\n"
+               :content            {:body (str "Consider using:\n"
                                         "```clojure\n"
                                         (pprint-code alt) "\n"
                                         "```\n"
                                         "instead of:\n"
                                         "```clojure\n"
                                         (pprint-code expr) "\n"
-                                        "```")
-               :remediation_points 500}]
-    (println (json/generate-string issue))))
+                                        "```")}
+               :remediation_points 50000}]
+    (println (str (json/generate-string issue) "\0"))))
 
 (defn exclude? [excluded-paths candidate]
   (some #(.startsWith candidate %) excluded-paths))
