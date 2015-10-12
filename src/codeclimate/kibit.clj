@@ -83,7 +83,7 @@
     (cond
       (:help options) (exit 0 (usage summary))
       (not= (count arguments) 1) (exit 1 (usage summary))
-      errors (exit 1 (error-msg errors)))
+      errors (exit 0 (error-msg errors)))
     (let [target-dir  (io/file (first arguments))
           config-file (io/file (:config options))
           config-data (when (and config-file (.exists config-file))
