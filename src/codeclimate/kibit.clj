@@ -28,7 +28,7 @@
         issue {:type               "issue"
                :check_name         "kibit/suggestion"
                :description        (str "Non-idiomatic code found in `" (first (seq expr)) "`")
-               :categories         ["Clarity" "Style"]
+               :categories         ["Style"]
                :location           {:path  (subs (str file) 2)
                                     :lines {:begin line
                                             :end   line}}
