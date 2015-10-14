@@ -18,13 +18,9 @@
 
 (defn template-solution [alt expr]
   (str "<p>Consider using:</p>"
-       "<span class=\"code_wrapper\"><pre><code>"
-       (pprint-code alt)
-       "</code></pre></span>"
+       "<pre>```" (pprint-code alt) "```</pre>"
        "<p>instead of:</p>"
-       "<span class=\"code_wrapper\"><pre><code>"
-       (pprint-code expr)
-       "</code></pre></span>"))
+       "<pre>```" (pprint-code expr) "```</pre>"))
 
 (defn codeclimate-reporter
   [check-map]
