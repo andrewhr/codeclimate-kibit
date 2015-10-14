@@ -16,6 +16,16 @@
               :pretty true)
     (str string-writer)))
 
+(defn template-solution [alt expr]
+  (str "<p>Consider using:</p>"
+       "<span class=\"code_wrapper\"><pre><code>"
+       (pprint-code alt)
+       "</code></pre></span>"
+       "<p>instead of:</p>"
+       "<span class=\"code_wrapper\"><pre><code>"
+       (pprint-code expr)
+       "</code></pre></span>"))
+
 (defn codeclimate-reporter
   [check-map]
   (let [{:keys [file line expr alt]} check-map
@@ -26,14 +36,7 @@
                :location           {:path  (subs (str file) 2)
                                     :lines {:begin line
                                             :end   line}}
-               :content            {:body (str "Consider using:\n"
-                                        "```clojure\n"
-                                        (pprint-code alt) "\n"
-                                        "```\n"
-                                        "instead of:\n"
-                                        "```clojure\n"
-                                        (pprint-code expr) "\n"
-                                        "```")}
+               :content            {:body (template-solution alt expr)}
                :remediation_points 50000}]
     (println (str (json/generate-string issue) "\0"))))
 
