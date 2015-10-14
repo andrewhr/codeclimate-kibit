@@ -54,7 +54,7 @@
                                                         codeclimate-reporter)
         target-files  (target-files dir config)]
     (with-redefs [reporters/name-to-reporter reporters-map]
-      (kibit/run target-files "-r" reporter-name))))
+      (doall (kibit/run target-files "--reporter" reporter-name)))))
 
 (def cli-options
   [["-C" "--config PATH" "Load PATH as a config file"]
