@@ -29,29 +29,25 @@
                :check_name         "kibit/suggestion"
                :description        (str "Non-idiomatic code found in `" (first (seq expr)) "`")
                :categories         ["Style"]
-               :location           {:path  (subs (str file) 2)
+               :location           {:path  (str file)
                                     :lines {:begin line
                                             :end   line}}
                :content            {:body (template-solution alt expr)}
                :remediation_points 50000}]
     (println (str (json/generate-string issue) "\0"))))
 
-(defn exclude? [excluded-paths candidate]
-  (some #(.startsWith candidate %) excluded-paths))
-
 (defn target-files
-  [dir config]
-  (let [excluded (map #(str (io/file dir %)) (:exclude_paths config))]
-    (->> (file-seq dir)
-         (filter #(.isFile ^File %))
-         (remove #(exclude? excluded (str ^File %))))))
+  [config]
+  (let [included (map #(io/file %) (get config :include_paths))]
+    (let [expanded (flatten (map file-seq included))]
+      (map str (filter #(.isFile ^File %) expanded)))))
 
-(defn analize
+(defn analyze
   [dir config]
   (let [reporter-name "codeclimate"
         reporters-map (assoc reporters/name-to-reporter reporter-name
                                                         codeclimate-reporter)
-        target-files  (target-files dir config)]
+        target-files  (target-files config)]
     (with-redefs [reporters/name-to-reporter reporters-map]
       (doall (kibit/run target-files "--reporter" reporter-name)))))
 
@@ -86,5 +82,5 @@
     (let [target-dir  (io/file (first arguments))
           config-file (io/file (:config options))
           config-data (when (and config-file (.exists config-file))
-                        (json/parse-string (slurp config-file)))]
-      (analize target-dir config-data))))
+                        (json/parse-string (slurp config-file) true))]
+      (analyze target-dir config-data))))
