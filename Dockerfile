@@ -10,4 +10,11 @@ WORKDIR /home/app
 RUN lein uberjar
 WORKDIR /code
 
-CMD ["java", "-jar", "/home/app/target/codeclimate-kibit.jar", ".", "-C", "/config.json"]
+CMD \
+  [ "java" \
+  , "-XX:+UseParNewGC" \
+  , "-XX:MinHeapFreeRatio=5" \
+  , "-XX:MaxHeapFreeRatio=10" \
+  , "-jar", "/home/app/target/codeclimate-kibit.jar", "." \
+  , "-C", "/config.json" \
+  ]
