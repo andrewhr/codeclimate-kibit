@@ -30,8 +30,8 @@
                :description        (str "Non-idiomatic code found in `" (first (seq expr)) "`")
                :categories         ["Style"]
                :location           {:path  (str file)
-                                    :lines {:begin line
-                                            :end   line}}
+                                    :lines {:begin (or line 1)
+                                            :end   (or line 1)}}
                :content            {:body (template-solution alt expr)}
                :remediation_points 50000}]
     (println (str (json/generate-string issue) "\0"))))
