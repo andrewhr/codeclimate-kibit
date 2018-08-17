@@ -7,3 +7,12 @@ pom.xml.asc
 *.class
 /.lein-*
 /.nrepl-port
+dev-resources/sample/target
+dev-resources/sample/classes
+dev-resources/sample/checkouts
+dev-resources/samplepom.xml
+dev-resources/samplepom.xml.asc
+dev-resources/sample*.jar
+dev-resources/sample*.class
+dev-resources/sample/.lein-*
+dev-resources/sample/.nrepl-port
