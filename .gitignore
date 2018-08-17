@@ -16,3 +16,4 @@ dev-resources/sample*.jar
 dev-resources/sample*.class
 dev-resources/sample/.lein-*
 dev-resources/sample/.nrepl-port
+config.json
