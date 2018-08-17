@@ -7,6 +7,6 @@
                  [org.clojure/tools.cli "0.3.7"]
                  [jonase/kibit "0.1.6"]
                  [cheshire "5.8.0"]]
-  :aot :all
+  :profiles {:uberjar {:aot :all}}
   :main codeclimate.kibit
   :uberjar-name "codeclimate-kibit.jar")
