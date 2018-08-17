@@ -3,6 +3,7 @@
             [clojure.pprint :as pp]
             [clojure.tools.cli :as cli]
             [kibit.driver :as kibit]
+            kibit.check
             [kibit.reporters :as reporters]
             [cheshire.core :as json])
   (:import (java.io StringWriter File))
@@ -44,12 +45,10 @@
 
 (defn analyze
   [dir config]
-  (let [reporter-name "codeclimate"
-        reporters-map (assoc reporters/name-to-reporter reporter-name
-                                                        codeclimate-reporter)
-        target-files  (target-files config)]
-    (with-redefs [reporters/name-to-reporter reporters-map]
-      (doall (kibit/run target-files "--reporter" reporter-name)))))
+  (let [target-files  (target-files config)]
+    (mapv #(kibit.check/check-file %
+                                   :reporter codeclimate-reporter)
+          target-files)))
 
 (def cli-options
   [["-C" "--config PATH" "Load PATH as a config file"]
@@ -69,6 +68,13 @@
   (str "The following errors occurred while parsing your command:\n\n"
        (clojure.string/join \newline errors)))
 
+(defn run-checks [arguments options]
+  (let [target-dir  (io/file (first arguments))
+          config-file (io/file (:config options))
+          config-data (when (and config-file (.exists config-file))
+                        (json/parse-string (slurp config-file) true))]
+      (analyze target-dir config-data)))
+
 (defn exit [status message]
   (println message)
   (System/exit status))
@@ -79,8 +85,4 @@
       (:help options) (exit 0 (usage summary))
       (not= (count arguments) 1) (exit 1 (usage summary))
       errors (exit 0 (error-msg errors)))
-    (let [target-dir  (io/file (first arguments))
-          config-file (io/file (:config options))
-          config-data (when (and config-file (.exists config-file))
-                        (json/parse-string (slurp config-file) true))]
-      (analyze target-dir config-data))))
+    (run-checks arguments options)))
