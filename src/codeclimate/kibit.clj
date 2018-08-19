@@ -30,7 +30,7 @@
   Options map should contain `config` key which points
   at config.json passed by CodeClimates executor"
   [target-dir-path
-                  {:keys [config] :as options}]
+   {:keys [config] :as options}]
   (let [target-dir (io/file target-dir-path)
         config-file (io/file config)
         config-data (when (and config-file (.exists config-file))

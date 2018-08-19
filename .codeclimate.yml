@@ -6,3 +6,4 @@ ratings:
   paths: []
 exclude_paths:
 - test/**/*
+- target

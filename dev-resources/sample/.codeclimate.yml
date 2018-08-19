@@ -4,7 +4,7 @@ engines:
     enabled: true
 
 include_paths:
-  - user/
-exclude_paths:
-  - test/**/*
   - extra
+exclude_paths:
+  - user/**/*
+  - project.clj

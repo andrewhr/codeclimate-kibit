@@ -7,6 +7,11 @@
             kibit.driver)
   (:import (java.io StringWriter File)))
 
+(defn- >errf
+  "Like printf but prints to STDERR"
+  [fmt & args]
+  (.println *err* (apply format (apply conj [fmt] args))))
+
 (defn pprint-code [form]
   (let [string-writer (StringWriter.)]
     (pp/write form
@@ -26,7 +31,7 @@
   (let [{:keys [file line expr alt]} check-map
         issue {:type               "issue"
                :check_name         "kibit/suggestion"
-               :description        (str "Non-idiomatic code found in `" (first (seq expr)) "`")
+               :description        (str "Non-idiomatic code found in `" expr "`")
                :categories         ["Style"]
                :location           {:path  (str file)
                                     :lines {:begin line
@@ -72,8 +77,13 @@
 (defn- do-analysis
   "Shortcut for easier mapping"
   [path]
-  (kibit.check/check-file path
-                          :reporter codeclimate-reporter))
+  (>errf "[cc-kibit] analyzing %s" (str path))
+  (try
+    (kibit.check/check-file path
+                            :reporter codeclimate-reporter)
+    (catch Exception e
+      (>errf "[cc-kibit] failed to analyze %s" (str path)))))
+
 (defn analyze
   "Runs analysis for all Clojure files found in `project-dir`
   Config is parsed config.json"
