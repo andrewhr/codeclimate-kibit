@@ -1,13 +1,9 @@
 (ns codeclimate.kibit
-  (:require [clojure.java.io :as io]
-            [clojure.pprint :as pp]
-            [clojure.tools.cli :as cli]
-            [kibit.driver :as kibit]
+  (:require [cheshire.core :as json]
+            [clojure.java.io :as io]
             [clojure.string :as s]
-            kibit.check
-            [kibit.reporters :as reporters]
-            [codeclimate.reporter :as cc.reporter]
-            [cheshire.core :as json])
+            [clojure.tools.cli :as cli]
+            [codeclimate.reporter :as cc.reporter])
   (:import (java.io StringWriter File))
   (:gen-class))
 
@@ -18,18 +14,22 @@
 (defn usage [options-summary]
   (->> ["CodeClimate kibit engine"
         ""
-        "Usage: java -jar codeclimate.jar [options] DIR"
+        "Usage: java -jar codeclimate-kibit.jar [options] DIR"
         ""
         "Options:"
         options-summary
         ""]
-       (clojure.string/join \newline)))
+       (s/join \newline)))
 
 (defn error-msg [errors]
   (str "The following errors occurred while parsing your command:\n\n"
        (s/join \newline errors)))
 
-(defn run-checks [target-dir-path
+(defn run-checks
+  "Runs checks against a project.
+  Options map should contain `config` key which points
+  at config.json passed by CodeClimates executor"
+  [target-dir-path
                   {:keys [config] :as options}]
   (let [target-dir (io/file target-dir-path)
         config-file (io/file config)
