@@ -22,9 +22,9 @@
       (is (= ["dev-resources/sample/extra/extra.clj"
               "dev-resources/sample/src/sample/core.clj"]
              (sort (map str file-list))))))
-(testing "no duplicates"
-  (let [file-list (reporter/build-file-list  (io/file "dev-resources/sample/")
-                                             {:include_paths ["src"]})]
+  (testing "no duplicates"
+    (let [file-list (reporter/build-file-list  (io/file "dev-resources/sample/")
+                                               {:include_paths ["src"]})]
       (is (= 2 (count file-list)))
       (is (= ["dev-resources/sample/src/sample/core.clj"
               "dev-resources/sample/src/sample/user/user.clj"]
@@ -40,7 +40,7 @@
   (testing "with full config"
     (let [project-path  (io/file "dev-resources/sample")
           config  {:include_paths ["extra"]
-                   :exclude_paths ["user/**/*" "project.clj"] }
+                   :exclude_paths ["user/**/*" "project.clj"]}
           parsed-output (run-and-parse project-path
                                        config)]
       (is (= 3 (count parsed-output))) ; extra(1 err) + core(2 errs), without excluded
