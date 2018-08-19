@@ -1,11 +1,10 @@
 (ns codeclimate.reporter
-  (:require [clojure.java.io :as io]
+  (:require [cheshire.core :as json]
+            [clojure.java.io :as io]
             [clojure.pprint :as pp]
-            [clojure.tools.cli :as cli]
-            kibit.driver
+            [clojure.string :as s]
             kibit.check
-            [kibit.reporters :as reporters]
-            [cheshire.core :as json])
+            kibit.driver)
   (:import (java.io StringWriter File)))
 
 (defn pprint-code [form]
@@ -36,19 +35,48 @@
                :remediation_points 50000}]
     (println (str (json/generate-string issue) "\0"))))
 
-(defn target-files
-  [config]
-  (->> (:include_paths config)
-       (map #(cond
-               (string? %) (io/file %)
-               :else %))
-       (map kibit.driver/find-clojure-sources-in-dir)
-       flatten
-       distinct))
+(defn build-file-list
+  "Builds a list of files to analyze by kibit.
+  Initial list is based on `src` dir +  `include_paths`.
+  Then it's reduced by taking paths found in `exclude_paths` key.
 
+  Since CodeClimate config uses globbing syntax (e.g. test/**/*)
+  it has to deal with it somehow- for now it converts path matchers to
+  regexes and uses that for matching.
+  It could use JDK7+ NIO globbing support.
+  All paths are looked up against project-dir"
+  [project-dir
+   {:keys [exclude_paths include_paths] :as config}]
+  (let [exclusion-patterns (->> exclude_paths
+                                ;; convert *
+                                (map #(s/replace % #"\*{1,}" ".+"))
+                                ;; make dir separators optional
+                                (map #(s/replace % #"/" "/?"))
+                                ;; prepend project dir
+                                (map #(re-pattern (str "^" project-dir ".*/?" %))))
+        ;; src is a standard for most Clojure projects, so lets use that
+        include-paths (apply conj ["src"] include_paths)
+        ;; prepend project dir
+        all-paths (map #(str project-dir "/" %) include-paths)
+        all-files (->> (map io/file all-paths)
+                       (map kibit.driver/find-clojure-sources-in-dir)
+                       flatten
+                       (map str)
+                       distinct)
+        filtered-paths (remove (fn remover [path]
+                                 (some (fn matcher [rgx]
+                                         (re-find rgx path)) exclusion-patterns))
+                               all-files)]
+    (mapv io/file filtered-paths)))
+
+(defn- do-analysis
+  "Shortcut for easier mapping"
+  [path]
+  (kibit.check/check-file path
+                          :reporter codeclimate-reporter))
 (defn analyze
-  [dir config]
-  (let [target-files (target-files (update config :include_paths conj dir))]
-    (mapv #(kibit.check/check-file %
-                                   :reporter codeclimate-reporter)
-          target-files)))
+  "Runs analysis for all Clojure files found in `project-dir`
+  Config is parsed config.json"
+  [project-dir config]
+  (let [files-to-analyze (build-file-list project-dir config)]
+    (mapv do-analysis files-to-analyze)))
