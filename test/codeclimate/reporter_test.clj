@@ -50,7 +50,7 @@
               :check_name "kibit/suggestion"
               :remediation_points 50000
               :type "issue"
-              :description "Non-idiomatic code found in `->`"
+              :description "Non-idiomatic code found in `(-> args first)`"
               :location {:lines {:begin 5 :end 5}
                          :path "dev-resources/sample/src/sample/core.clj"}}
              (first parsed-output)))
