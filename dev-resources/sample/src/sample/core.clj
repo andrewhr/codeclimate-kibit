@@ -1,4 +1,4 @@
-(ns sample.failing)
+(ns sample.core)
 
 (defn not-ok-1
   [& args]
@@ -7,7 +7,6 @@
 
 
 (defn not-ok-2 [arg]
-  "doc string after args"
   (if (string? arg)
     (println arg)
     nil))

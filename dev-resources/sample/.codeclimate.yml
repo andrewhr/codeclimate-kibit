@@ -2,7 +2,9 @@
 engines:
   kibit:
     enabled: true
-ratings:
-  paths: []
+
+include_paths:
+  - user/
 exclude_paths:
-- test/**/*
+  - test/**/*
+  - extra
