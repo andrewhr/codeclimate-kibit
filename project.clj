@@ -9,11 +9,10 @@
                  [jonase/kibit "0.1.6"]
                  [cheshire "5.8.0"]]
 
-  :profiles {:dev {
-                   :resource-paths ["dev-resources"
+  :profiles {:dev {:resource-paths ["dev-resources"
                                     "test/codeclimate"]}
-             :uberjar {
-                       :aot :all}}
+             :uberjar {:aot :all}}
 
+  :plugins [[lein-cloverage "1.0.6" :exclusions [org.clojure/clojure]]]
   :main codeclimate.kibit
   :uberjar-name "codeclimate-kibit.jar")

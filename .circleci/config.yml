@@ -9,10 +9,12 @@ jobs:
       LEIN_ROOT: "true"
       # Customize the JVM maximum heap limit
       JVM_OPTS: -Xmx3200m
-    
+      LEIN_FAST_TRAMPOLINE: 1
+
     steps:
       - checkout
 
+      # Restore or install Maven dependencies
       - restore_cache:
           keys:
           - v1-dependencies-{{ checksum "project.clj" }}
@@ -24,5 +26,36 @@ jobs:
           paths:
             - ~/.m2
           key: v1-dependencies-{{ checksum "project.clj" }}
-        
-      - run: lein test
+
+      # Restore or download CodeClimates test coverage reporter
+      - restore_cache:
+          keys:
+            - cc-reporter-{{ checksum "cc-test-reporter" }}
+            - cc-reporter-
+
+      - run:
+          name: Setup Code Climate test-reporter
+          command: |
+            if [ ! -f ./cc-test-reporter ] ; then
+              curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+              chmod +x ./cc-test-reporter
+            fi
+
+      - save_cache:
+          paths:
+            - ./cc-test-reporter
+          key: cc-reporter-{{ checksum "cc-test-reporter" }}
+
+      # Run the tests and get coverage report
+      # Coverage reporter expects the report to located in coverage/lcov.info
+      # Additionally, we have to fix the report to use full project paths
+      # Cloverage removes src/ from lcov report paths
+      - run:
+          name: 'Run tests and report coverage'
+          command: |
+            ./cc-test-reporter before-build
+            lein trampoline cloverage --lcov --no-text --no-html --no-summary -o $PWD
+            testRes=$?
+            mkdir -p coverage
+            sed  's/SF:/SF:src\//' lcov.info > coverage/lcov.info
+            ./cc-test-reporter after-build --coverage-input-type lcov --exit-code $testRes
