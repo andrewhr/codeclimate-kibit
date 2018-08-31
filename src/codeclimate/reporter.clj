@@ -28,17 +28,18 @@
 
 (defn codeclimate-reporter
   [check-map]
-  (let [{:keys [file line expr alt]} check-map
-        issue {:type               "issue"
-               :check_name         "kibit/suggestion"
-               :description        (str "Non-idiomatic code found in `" expr "`")
-               :categories         ["Style"]
-               :location           {:path  (str file)
-                                    :lines {:begin line
-                                            :end   line}}
-               :content            {:body (template-solution alt expr)}
-               :remediation_points 50000}]
-    (println (str (json/generate-string issue) "\0"))))
+  (when-let [line (:line check-map)]
+    (let [{:keys [file expr alt]} check-map
+          issue {:type               "issue"
+                 :check_name         "kibit/suggestion"
+                 :description        (str "Non-idiomatic code found in `" expr "`")
+                 :categories         ["Style"]
+                 :location           {:path  (str file)
+                                      :lines {:begin line
+                                              :end   line}}
+                 :content            {:body (template-solution alt expr)}
+                 :remediation_points 50000}]
+      (println (str (json/generate-string issue) "\0")))))
 
 (defn build-file-list
   "Builds a list of files to analyze by kibit.
