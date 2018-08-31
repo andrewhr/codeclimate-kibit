@@ -27,24 +27,11 @@ jobs:
             - ~/.m2
           key: v1-dependencies-{{ checksum "project.clj" }}
 
-      # Restore or download CodeClimates test coverage reporter
-      - restore_cache:
-          keys:
-            - cc-reporter-{{ checksum "cc-test-reporter" }}
-            - cc-reporter-
-
       - run:
           name: Setup Code Climate test-reporter
           command: |
-            if [ ! -f ./cc-test-reporter ] ; then
-              curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
-              chmod +x ./cc-test-reporter
-            fi
-
-      - save_cache:
-          paths:
-            - ./cc-test-reporter
-          key: cc-reporter-{{ checksum "cc-test-reporter" }}
+            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+            chmod +x ./cc-test-reporter
 
       # Run the tests and get coverage report
       # Coverage reporter expects the report to located in coverage/lcov.info
