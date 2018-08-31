@@ -1,5 +1,7 @@
 # Code Climate clojure-kibit Engine
 
+[![CircleCI](https://circleci.com/gh/lukaszkorecki/codeclimate-kibit/tree/master.svg?style=svg)](https://circleci.com/gh/lukaszkorecki/codeclimate-kibit/tree/master)
+
 `codeclimate-kibit` is a Code Climate engine that wraps [kibit](https://github.com/jonase/kibit). You can run it on your command line using the Code Climate CLI, or on our hosted analysis platform.
 
 ### Installation & Usage
