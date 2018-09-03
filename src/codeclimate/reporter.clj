@@ -26,6 +26,12 @@
        "<p>instead of:</p>"
        "<pre>```" (pprint-code expr) "```</pre>"))
 
+(defn- clean-path
+  "Removes ./ from paths when . is used as project dir
+  or path passed to the CLI starts with ./"
+  [file-path]
+  (s/replace (str file-path) #"^\.\/" ""))
+
 (defn codeclimate-reporter
   [check-map]
   (when-let [line (:line check-map)]
@@ -34,7 +40,7 @@
                  :check_name         "kibit/suggestion"
                  :description        (str "Non-idiomatic code found in `" expr "`")
                  :categories         ["Style"]
-                 :location           {:path  (str file)
+                 :location           {:path (clean-path file)
                                       :lines {:begin line
                                               :end   line}}
                  :content            {:body (template-solution alt expr)}

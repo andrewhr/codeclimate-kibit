@@ -62,8 +62,17 @@
                 {:lines {:begin 4 :end 4}
                  :path "dev-resources/sample/extra/extra.clj"}]
                (mapv :location parsed-output))))))
+  (testing "root path - no leading ./"
+    (let [project-path  (io/file ".")
+          parsed-output (run-and-parse project-path {})]
+      (is (= "src/codeclimate/ignore_me.clj"
+             (->> parsed-output
+                  (filter #(re-find #"ignore" (:path (:location %)) ))
+                  first
+                  :location
+                  :path)))))
   (testing "no config - by default only analyzes src/"
-    (let [project-path  (io/file "dev-resources/sample")
+    (let [project-path  (io/file "./dev-resources/sample")
           parsed-output (run-and-parse project-path {})]
       (is (= [{:lines {:begin 5 :end 5}
                :path "dev-resources/sample/src/sample/core.clj"}
