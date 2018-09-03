@@ -65,7 +65,7 @@
   (testing "root path - no leading ./"
     (let [project-path  (io/file ".")
           parsed-output (run-and-parse project-path {})]
-      (is (= "src/codeclimate/ignore_me.clj"
+      (is (= "src/codeclimate/ignore.clj"
              (->> parsed-output
                   (filter #(re-find #"ignore" (:path (:location %)) ))
                   first
