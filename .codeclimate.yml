@@ -1,8 +1,12 @@
 ---
+version: "2"
 engines:
+  todo:
+    enabled: true
   kibit:
     enabled: true
-ratings:
-  paths: []
+
 exclude_paths:
-- test/**/*
+  - test/**/*
+  - target
+  - dev-resources

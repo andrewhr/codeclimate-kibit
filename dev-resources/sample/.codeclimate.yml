@@ -1,0 +1,10 @@
+---
+engines:
+  kibit:
+    enabled: true
+
+include_paths:
+  - extra
+exclude_paths:
+  - user/**/*
+  - project.clj

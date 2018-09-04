@@ -4,8 +4,10 @@ MAINTAINER Andrew Rosa
 RUN useradd -r -s /bin/false -m app
 USER app
 ADD project.clj /home/app/project.clj
-ADD src /home/app/src
 WORKDIR /home/app
+
+RUN lein deps
+ADD src /home/app/src
 
 RUN lein uberjar
 WORKDIR /code
